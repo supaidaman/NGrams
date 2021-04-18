@@ -9,6 +9,7 @@ import org.apache.commons.lang.UnhandledException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapred.FileSplit;
 import org.apache.hadoop.mapreduce.Mapper;
 
 
@@ -26,17 +27,19 @@ public class NGramsMapper extends Mapper<Object, Text, Text, IntWritable> {
 
         String line = value.toString();
         StringTokenizer st = new StringTokenizer(line, " ");
-        ArrayList<String> myArray = new ArrayList<String>();
+        ArrayList<String> stringTokens = new ArrayList<String>();
         while (st.hasMoreTokens()){
-            myArray.add(st.nextToken());
+            stringTokens.add(st.nextToken());
         }
-        try {
-            var result = NGramImpl.doNGrams(nGramsSize, minimumCountSize, myArray);
 
-            result.forEach((k, v) ->
+      //  String fileName = ((FileSplit) context.getInputSplit()).getPath().getName(); //dunno how to use now...
+
+
+        try {
+            var result = NGramImpl.doNGrams(nGramsSize, stringTokens);
+            result.forEach(ngram ->
             {
-                word.set(k);
-                NUMBER.set(v);
+                word.set(ngram);
                 try {
                     context.write(word, NUMBER);
                 }
@@ -45,6 +48,7 @@ public class NGramsMapper extends Mapper<Object, Text, Text, IntWritable> {
 
                 }
             });
+
         }
         catch (Exception e)
         {

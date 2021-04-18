@@ -5,40 +5,30 @@ import java.util.*;
 public class NGramImpl {
 
 
-    public static HashMap<String,Integer> doNGrams(Integer size, Integer limit, ArrayList<String> sentence)
+    public static ArrayList<String> doNGrams(Integer size,ArrayList<String> palavras)
             throws Exception {
 
         if(size <= 0)
             throw new Exception("Tamanho Inválido");
 
-        String empty = " ";
+
         ArrayList<String> ngrams = new ArrayList<String>();
-        HashMap<String,Integer> vocabularyCount = new HashMap<String,Integer>();
-        Set<String> vocabulary = new HashSet<String>(sentence);
 
 
-        for(int i =0; i < sentence.size() - size + 1; i++)
+
+        for(int i =0; i < palavras.size() - size + 1; i++)
         {
-            String palavraNGram = sentence.get(i);
+            String palavraNGram = palavras.get(i);
 
             for(int j = i + 1; j < (i + size); j++)
             {
-                palavraNGram+= empty + sentence.get(j);
+                palavraNGram+= " " + palavras.get(j);
             }
-            if(vocabularyCount.containsKey(palavraNGram))
-            {
-               Integer value = vocabularyCount.get(palavraNGram);
-               value= value + 1;
-               vocabularyCount.replace(palavraNGram,value);
-            }
-            else
-            {
-                vocabularyCount.put(palavraNGram,1);
-            }
+            ngrams.add(palavraNGram);
 
         }
-        vocabularyCount.entrySet().removeIf(e -> e.getValue() < limit);
 
-        return  vocabularyCount;
+
+        return  ngrams;
     }
 }
