@@ -2,20 +2,19 @@ package br.com.ggvd.NGrams;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.StringTokenizer;
 
-import org.apache.commons.lang.UnhandledException;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.FileSplit;
+import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import org.apache.hadoop.mapreduce.Mapper;
 
 
-public class NGramsMapper extends Mapper<Object, Text, Text, IntWritable> {
+public class NGramsMapper extends Mapper<Object, Text, Text, NGramResultWriteable> {
 
-    private final IntWritable NUMBER = new IntWritable(1);
+    private final  NGramResultWriteable NGRAM = new NGramResultWriteable();
     private final Text word = new Text();
 
     @Override
@@ -32,19 +31,21 @@ public class NGramsMapper extends Mapper<Object, Text, Text, IntWritable> {
             stringTokens.add(st.nextToken());
         }
 
-      //  String fileName = ((FileSplit) context.getInputSplit()).getPath().getName(); //dunno how to use now...
+       String fileName = ((FileSplit) context.getInputSplit()).getPath().getName();
 
-
+        //foi necessário colocar o trycatch pois meu compilador estava reclamando
         try {
             var result = NGramImpl.doNGrams(nGramsSize, stringTokens);
             result.forEach(ngram ->
             {
+                NGRAM.setnGramCount(new IntWritable(1));
+                NGRAM.setFileName(new Text(fileName));
                 word.set(ngram);
                 try {
-                    context.write(word, NUMBER);
+                    context.write(word, NGRAM);
                 }
                 catch (IOException | InterruptedException unhandledException)
-                { System.out.println("deu ruim no write");
+                { System.out.println("erro ao escrever");
 
                 }
             });
@@ -52,7 +53,7 @@ public class NGramsMapper extends Mapper<Object, Text, Text, IntWritable> {
         }
         catch (Exception e)
         {
-            System.out.println("deu ruim");
+            System.out.println("Ocorreu um problema na execução");
         }
 
     }

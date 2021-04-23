@@ -1,7 +1,7 @@
 package br.com.ggvd.NGrams;
 
 import java.util.*;
-
+//Implementação do NGram
 public class NGramImpl {
 
 
@@ -10,12 +10,7 @@ public class NGramImpl {
 
         if(size <= 0)
             throw new Exception("Tamanho Inválido");
-
-
         ArrayList<String> ngrams = new ArrayList<String>();
-
-
-
         for(int i =0; i < palavras.size() - size + 1; i++)
         {
             String palavraNGram = palavras.get(i);
